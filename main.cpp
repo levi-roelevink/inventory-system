@@ -20,6 +20,7 @@ void printFileContents(fstream *file) {
   string prev;
   while (true) {
     prev = s;
+    string s;
     getline(*file, s);
 
     if (s == prev) {
@@ -30,9 +31,23 @@ void printFileContents(fstream *file) {
   }
 }
 
+void addItem(string val, fstream *file) { *file << val; }
+
 int main() {
   fstream file = openFile(PATH);
 
-  printFileContents(&file);
+  addItem("Banana ", &file);
+  addItem("Blueberries ", &file);
+  addItem("Apple ", &file);
+  addItem("Mango ", &file);
+  addItem("Kiwi ", &file);
+
+  string s;
+  getline(file, s);
+
+  cout << s << endl;
+
+  file.close();
+
   return 0;
 }
