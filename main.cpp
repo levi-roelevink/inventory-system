@@ -36,16 +36,16 @@ void addItem(string val, fstream *file) { *file << val; }
 int main() {
   fstream file = openFile(PATH);
 
-  addItem("Banana ", &file);
-  addItem("Blueberries ", &file);
-  addItem("Apple ", &file);
-  addItem("Mango ", &file);
-  addItem("Kiwi ", &file);
+  addItem("Banana\n", &file);
+  addItem("Blueberries\n", &file);
+  addItem("Apple\n", &file);
+  addItem("Mango\n", &file);
+  addItem("Kiwi\n", &file);
 
-  string s;
-  getline(file, s);
+  // Reset file position pointer before switching from write to read
+  file.seekg(0);
 
-  cout << s << endl;
+  printFileContents(&file);
 
   file.close();
 
