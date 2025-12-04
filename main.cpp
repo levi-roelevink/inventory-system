@@ -1,3 +1,4 @@
+#include <cstddef>
 #include <fstream>
 #include <iostream>
 
@@ -31,20 +32,34 @@ void printFileContents(fstream *file) {
   }
 }
 
-void addItem(string val, fstream *file) { *file << val; }
+string promptUser() {
+  cout << "Product name: ";
+
+  string input;
+
+  cin >> input;
+
+  return input;
+}
+
+void addItem(fstream *file) {
+  string val = promptUser();
+  *file << val;
+}
 
 int main() {
   fstream file = openFile(PATH);
 
-  addItem("Banana\n", &file);
-  addItem("Blueberries\n", &file);
-  addItem("Apple\n", &file);
-  addItem("Mango\n", &file);
-  addItem("Kiwi\n", &file);
+  file << "Banana\n";
+  file << "Blueberries\n";
+  file << "Apple\n";
+  file << "Mango\n";
+  file << "Kiwi\n";
+
+  addItem(&file);
 
   // Reset file position pointer before switching from write to read
   file.seekg(0);
-
   printFileContents(&file);
 
   file.close();
