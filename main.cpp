@@ -9,9 +9,13 @@ const string PATH = "inventory.txt";
 fstream openFile(string path) {
   // Open file for reading and writing
   fstream stream(path, ios::in | ios::out);
-  // TODO: what if file does not exist?
-  // I know that if opened in write mode and the file does not exist, it will be
-  // created. However, read mode will throw an exception.
+  if (!stream) {
+    // File did not exist yet, so a file is created with an output file stream
+    ofstream oStr(path);
+    oStr.close();
+
+    return fstream(path, ios::in | ios::out);
+  }
 
   return stream;
 }
@@ -38,6 +42,9 @@ string promptUser() {
   string input;
 
   cin >> input;
+  // TODO: What if there's a whitespace character?
+  // Also try adding multiple items to see if they're formatted correctly in the
+  // txt file
 
   return input;
 }
