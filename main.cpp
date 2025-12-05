@@ -31,25 +31,45 @@ int selectBetweenBounds(int lowerBound, int upperBound) {
   return result;
 }
 
-void listInventory() { 
-  cout << "List inventory" << endl; 
-}
-
 void addProduct() { cout << "Add product" << endl; }
 
 void removeProduct() { cout << "Remove product" << endl; }
 
-// Print menu options
-// Prompt user for menu selection
-// Call selected functionality
-int menuSelection() {
+void listInventory(fstream *file) {
+  // Reset file position pointer before switching from write to read
+  file->seekp(0);
+
+  cout << "Current inventory:\n**********\n";
+
+  string s;
+  string prev;
+
+  while (true) {
+    prev = s;
+    string s;
+    getline(*file, s);
+
+    if (s == prev) {
+      break;
+    }
+
+    cout << s << endl;
+  }
+
+  cout << "*********\n";
+}
+
+// 1. Print menu options
+// 2. Prompt user for menu selection
+// 3. Call selected functionality
+int menuSelection(fstream *file) {
   while (true) {
     cout << PRINT_MENU;
     int input = selectBetweenBounds(1, 4);
 
     switch (input) {
     case LIST_INVENTORY:
-      listInventory();
+      listInventory(file);
       break;
     case ADD_PRODUCT:
       addProduct();
@@ -60,6 +80,8 @@ int menuSelection() {
     case EXIT:
       return 0;
     }
+
+    cout << "\n";
   }
 }
 
@@ -75,22 +97,6 @@ fstream openFile(string path) {
   }
 
   return stream;
-}
-
-void printFileContents(fstream *file) {
-  string s;
-  string prev;
-  while (true) {
-    prev = s;
-    string s;
-    getline(*file, s);
-
-    if (s == prev) {
-      break;
-    }
-
-    cout << s << endl;
-  }
 }
 
 string promptUser() {
@@ -119,7 +125,7 @@ int main() {
   file << "Mango\n";
   file << "Kiwi\n";
 
-  int menuSelector = menuSelection();
+  int menuSelector = menuSelection(&file);
 
   file.close();
   cout << "Goodbye!" << endl;
