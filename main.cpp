@@ -1,5 +1,6 @@
 #include <cstddef>
 #include <cstdlib>
+#include <exception>
 #include <fstream>
 #include <iostream>
 
@@ -31,75 +32,7 @@ int selectBetweenBounds(int lowerBound, int upperBound) {
   return result;
 }
 
-void addProduct() { cout << "Add product" << endl; }
-
-void removeProduct() { cout << "Remove product" << endl; }
-
-void listInventory(fstream *file) {
-  // Reset file position pointer before switching from write to read
-  file->seekp(0);
-
-  cout << "Current inventory:\n**********\n";
-
-  string s;
-  string prev;
-
-  while (true) {
-    prev = s;
-    string s;
-    getline(*file, s);
-
-    if (s == prev) {
-      break;
-    }
-
-    cout << s << endl;
-  }
-
-  cout << "*********\n";
-}
-
-// 1. Print menu options
-// 2. Prompt user for menu selection
-// 3. Call selected functionality
-int menuSelection(fstream *file) {
-  while (true) {
-    cout << PRINT_MENU;
-    int input = selectBetweenBounds(1, 4);
-
-    switch (input) {
-    case LIST_INVENTORY:
-      listInventory(file);
-      break;
-    case ADD_PRODUCT:
-      addProduct();
-      break;
-    case REMOVE_PRODUCT:
-      removeProduct();
-      break;
-    case EXIT:
-      return 0;
-    }
-
-    cout << "\n";
-  }
-}
-
-fstream openFile(string path) {
-  // Open file for reading and writing
-  fstream stream(path, ios::in | ios::out);
-  if (!stream) {
-    // File did not exist yet, so a file is created with an output file stream
-    ofstream oStr(path);
-    oStr.close();
-
-    return fstream(path, ios::in | ios::out);
-  }
-
-  return stream;
-}
-
-string promptUser() {
+string promptUserForProduct() {
   cout << "Product name: ";
 
   string input;
@@ -111,23 +44,97 @@ string promptUser() {
   return input;
 }
 
-void addItem(fstream *file) {
-  string val = promptUser();
-  *file << val;
+void addProduct(string path) {
+  ofstream of;
+
+  // Opening file using ofstream
+  of.open(path, ios::app);
+  if (!of) {
+    cout << "Unable to find inventory." << endl;
+  } else {
+    string val = promptUserForProduct();
+
+    of << "\n" << val;
+    of.close();
+  }
+}
+
+void removeProduct(string path) { 
+}
+
+void listInventory(string path) {
+  // Open file in read mode
+  ifstream file(path);
+  cout << "Current inventory:\n**********\n";
+
+  string s;
+  string prev;
+
+  while (true) {
+    prev = s;
+    getline(file, s);
+
+    if (s == prev) {
+      break;
+    }
+
+    cout << s << endl;
+  }
+
+  cout << "*********\n";
+  file.close();
+}
+
+// 1. Print menu options
+// 2. Prompt user for menu selection
+// 3. Call selected functionality
+int menuSelection() {
+  while (true) {
+    cout << PRINT_MENU;
+    int input = selectBetweenBounds(1, 4);
+
+    switch (input) {
+    case LIST_INVENTORY:
+      listInventory(PATH);
+      break;
+    case ADD_PRODUCT:
+      addProduct(PATH);
+      break;
+    case REMOVE_PRODUCT:
+      removeProduct(PATH);
+      break;
+    case EXIT:
+      return 0;
+    }
+
+    cout << "\n";
+  }
+}
+
+void loadMockData(string path) {
+  // Open file for reading and writing
+  ofstream of;
+  of.open(path);
+  if (!of) {
+    cout << "Unable to find inventory. Please try again." << endl;
+    return;
+  }
+
+  of << "Banana\n";
+  of << "Blueberries\n";
+  of << "Apple\n";
+  of << "Mango\n";
+  of << "Kiwi\n";
+
+  of.close();
+  cout << "Loaded mock data." << endl;
 }
 
 int main() {
-  fstream file = openFile(PATH);
+  loadMockData(PATH);
 
-  file << "Banana\n";
-  file << "Blueberries\n";
-  file << "Apple\n";
-  file << "Mango\n";
-  file << "Kiwi\n";
+  int menuSelector = menuSelection();
 
-  int menuSelector = menuSelection(&file);
-
-  file.close();
   cout << "Goodbye!" << endl;
   return 0;
 }
@@ -136,4 +143,4 @@ int main() {
 
 // Reset file position pointer before switching from write to read
 // file.seekg(0);
-// printFileContents(&file);
+// printFileContents(&file)
