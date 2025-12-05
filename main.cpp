@@ -12,14 +12,13 @@ const int LIST_INVENTORY = 1;
 const int ADD_PRODUCT = 2;
 const int REMOVE_PRODUCT = 3;
 const int EXIT = 4;
-const string PRINT_MENU =
-    "**********\n(1) List inventory\n(2) Add "
-    "product\n(3) Remove product\n(4) Exit program\n**********\n";
+const string PRINT_MENU = "**********\n(1) List inventory\n(2) Add "
+                          "product\n(3) Remove product\n(4) Exit "
+                          "program\n**********\nSelect an option: ";
 
-int selectBetweenBounds(int lowerBound, int upperBound) {
+int selectIntBetweenBounds(int lowerBound, int upperBound) {
   int result;
 
-  cout << "Select an option: ";
   cin >> result;
   // TODO: What if input is not an integer
   while (result < lowerBound || result > upperBound) {
@@ -59,30 +58,52 @@ void addProduct(string path) {
   }
 }
 
-void removeProduct(string path) { 
-}
-
-void listInventory(string path) {
+int listInventory(string path, bool numbered) {
   // Open file in read mode
   ifstream file(path);
   cout << "Current inventory:\n**********\n";
 
-  string s;
-  string prev;
+  string s, prev;
+  int count = 0;
 
   while (true) {
     prev = s;
     getline(file, s);
 
-    if (s == prev) {
+    if (s == prev || s == "") {
       break;
     }
 
-    cout << s << endl;
+    count++;
+    if (numbered) {
+      cout << "(" << count << ") " << s << endl;
+    } else {
+      cout << s << endl;
+    }
   }
 
-  cout << "*********\n";
   file.close();
+
+  if (count == 0) {
+    cout << "There are currently no items in inventory." << endl;
+  }
+  cout << "*********";
+
+  return count;
+}
+
+void removeProduct(string path) {
+  int products = listInventory(path, true);
+
+  cout << "\nSelect a product to remove (0 to cancel): ";
+  int input = selectIntBetweenBounds(0, products);
+
+  if (input == 0) {
+    return;
+  }
+
+  cout << "Selected: " << input << endl;
+  // TODO: How to remove this product from the inventory?
 }
 
 // 1. Print menu options
@@ -91,11 +112,11 @@ void listInventory(string path) {
 int menuSelection() {
   while (true) {
     cout << PRINT_MENU;
-    int input = selectBetweenBounds(1, 4);
+    int input = selectIntBetweenBounds(1, 4);
 
     switch (input) {
     case LIST_INVENTORY:
-      listInventory(PATH);
+      listInventory(PATH, false);
       break;
     case ADD_PRODUCT:
       addProduct(PATH);
@@ -127,7 +148,7 @@ void loadMockData(string path) {
   of << "Kiwi\n";
 
   of.close();
-  cout << "Loaded mock data." << endl;
+  cout << "Loaded mock data.\n" << endl;
 }
 
 int main() {
