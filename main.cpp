@@ -49,7 +49,7 @@ void addProduct(string path) {
   // Opening file using ofstream
   of.open(path, ios::app);
   if (!of) {
-    cout << "Unable to find inventory." << endl;
+    cout << "Unable to find inventory. Please try again." << endl;
   } else {
     string val = promptUserForProduct();
 
@@ -96,7 +96,7 @@ void removeProduct(string path) {
   int products = listInventory(path, true);
 
   cout << "\nSelect a product to remove (0 to cancel): ";
-  int input = selectIntBetweenBounds(0, products);
+  int input = selectIntBetweenBounds(0, 999);
 
   if (input == 0) {
     return;
@@ -104,6 +104,25 @@ void removeProduct(string path) {
 
   cout << "Selected: " << input << endl;
   // TODO: How to remove this product from the inventory?
+
+  // Open file
+  // Set file position pointer
+  // Write ""
+  fstream f;
+  f.open(path);
+  if (!f) {
+    cout << "Unable to find inventory. Please try again." << endl;
+    return;
+  }
+
+  // First argument is the index of the character at which to start
+  // Banana is 6 characters long: at 0 = Banana, 1 = anana, 5 = a, and at 6 starts Blueberries
+  f.seekg(input, ios::beg);
+  string s;
+  f >> s;
+  cout << "Data at position " << input << ": \"" << s << "\"" << endl;
+  
+  f.close();
 }
 
 // 1. Print menu options
@@ -159,9 +178,3 @@ int main() {
   cout << "Goodbye!" << endl;
   return 0;
 }
-
-// addItem(&file);
-
-// Reset file position pointer before switching from write to read
-// file.seekg(0);
-// printFileContents(&file)
