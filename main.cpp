@@ -3,6 +3,7 @@
 #include <exception>
 #include <fstream>
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -92,15 +93,15 @@ int listInventory(string path, bool numbered) {
   return count;
 }
 
-void removeProduct(string path) {
+void removeP(string path) {
   int products = listInventory(path, true);
 
   cout << "\nSelect a product to remove (0 to cancel): ";
   int input = selectIntBetweenBounds(0, 999);
 
-  if (input == 0) {
-    return;
-  }
+  // if (input == 0) {
+  //   return;
+  // }
 
   cout << "Selected: " << input << endl;
   // TODO: How to remove this product from the inventory?
@@ -108,22 +109,25 @@ void removeProduct(string path) {
   // Open file
   // Set file position pointer
   // Write ""
-  fstream f;
-  f.open(path);
-  if (!f) {
-    cout << "Unable to find inventory. Please try again." << endl;
-    return;
-  }
+  // ofstream of;
+  // of.open(path);
+  // if (!of) {
+  //   cout << "Unable to find inventory. Please try again." << endl;
+  //   return;
+  // }
 
   // First argument is the index of the character at which to start
-  // Banana is 6 characters long: at 0 = Banana, 1 = anana, 5 = a, and at 6 starts Blueberries
-  f.seekg(input, ios::beg);
-  string s;
-  f >> s;
-  cout << "Data at position " << input << ": \"" << s << "\"" << endl;
-  
-  f.close();
+  // Banana is 6 characters long: at 0 = Banana, 1 = anana, 5 = a, and at 6
+  // starts Blueberries
+  // of.seekg(input, ios::app);
+  // string s;
+  // f >> s;
+  // cout << "Data at position " << input << ": \"" << s << "\"" << endl;
+
+  // of.close();
 }
+
+void removeProduct(string path) {}
 
 // 1. Print menu options
 // 2. Prompt user for menu selection
@@ -154,17 +158,16 @@ int menuSelection() {
 void loadMockData(string path) {
   // Open file for reading and writing
   ofstream of;
-  of.open(path);
+  of.open(path, ios:: trunc);
   if (!of) {
     cout << "Unable to find inventory. Please try again." << endl;
     return;
   }
 
   of << "Banana\n";
-  of << "Blueberries\n";
+  of << "Kiwi\n";
   of << "Apple\n";
   of << "Mango\n";
-  of << "Kiwi\n";
 
   of.close();
   cout << "Loaded mock data.\n" << endl;
