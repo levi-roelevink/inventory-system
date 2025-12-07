@@ -54,8 +54,10 @@ void addProduct(string path) {
   } else {
     string val = promptUserForProduct();
 
-    of << "\n" << val;
+    of << val << "\n";
     of.close();
+
+    cout << "Added " << val << " to inventory." << endl;
   }
 }
 
@@ -158,7 +160,7 @@ int menuSelection() {
 void loadMockData(string path) {
   // Open file for reading and writing
   ofstream of;
-  of.open(path, ios:: trunc);
+  of.open(path);
   if (!of) {
     cout << "Unable to find inventory. Please try again." << endl;
     return;
