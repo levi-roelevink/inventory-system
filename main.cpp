@@ -65,43 +65,6 @@ void addProduct(string path) {
   cout << "Added " << val << " to inventory." << endl;
 }
 
-int listInventory(string path, bool numbered) {
-  // Open file in read mode
-  ifstream file(path);
-  cout << "Current inventory:\n**********\n";
-
-  string s, prev;
-  int count = 0;
-
-  while (true) {
-    prev = s;
-    getline(file, s);
-
-    if (s == prev || s == "") {
-      break;
-    }
-
-    long strLength = s.length();
-
-    count++;
-    if (numbered) {
-      cout << "(" << count << ") " << s << " (strLength = " << strLength << ")"
-           << endl;
-    } else {
-      cout << s << " (strLength = " << strLength << ")" << endl;
-    }
-  }
-
-  file.close();
-
-  if (count == 0) {
-    cout << "There are currently no items in inventory." << endl;
-  }
-  cout << "*********";
-
-  return count;
-}
-
 int getProductPosition(int productIndex) {
   ifstream file(PATH);
   if (!file.is_open()) {
@@ -119,13 +82,13 @@ int getProductPosition(int productIndex) {
   return pos;
 }
 
-int loadMockData(string path) {
+void loadMockData(string path) {
   // Open file for reading and writing
   ofstream of;
   of.open(path);
   if (!of) {
     cout << "Unable to find inventory. Please try again." << endl;
-    return -1;
+    return;
   }
 
   of << "Banana\n";
@@ -135,37 +98,6 @@ int loadMockData(string path) {
 
   of.close();
   cout << "Loaded mock data.\n" << endl;
-
-  return 0;
-}
-
-int readThenWrite() {
-  ofstream file(PATH, ios::in | ios::out);
-
-  if (!file.is_open()) {
-    cerr << "ERROR!" << endl;
-    throw runtime_error("Failed to open file at: " + PATH);
-    return -1;
-  }
-
-  string text;
-  // file >> text;
-  // cout << "Read from file: " << text << endl;
-
-  long writePos = file.tellp();
-  cout << "Write position: " << writePos << endl;
-
-  file.seekp(0, ios::beg);
-  writePos = file.tellp();
-  cout << "Write position after seekp(0, ios::beg): " << writePos << endl;
-
-  // This should write
-  file << "Ananab";
-
-  file.close();
-  cout << "\n" << endl;
-
-  return 0;
 }
 
 vector<string> loadInventoryToVector() {
@@ -220,7 +152,34 @@ void removeProduct() {
   }
 
   products.erase(products.begin() + (input - 1));
+  // Write the whole vector without the removed element back to the file
   writeVectorToFile(products);
+}
+
+int listInventory(bool numbered) {
+  vector<string> products = loadInventoryToVector();
+  int size = products.size();
+
+  if (size == 0) {
+    cout << "There are currently no items in inventory." << endl;
+    cout << "*********";
+    return 0;
+  }
+
+  cout << "Current inventory:\n**********\n";
+  if (numbered) {
+    for (int i = 0; i < size; i++) {
+      cout << "(" << i + 1 << ") " << products[i] << endl;
+    }
+  } else {
+    for (string p : products) {
+      cout << p << endl;
+    }
+  }
+
+  cout << "*********";
+
+  return size;
 }
 
 // 1. Print menu options
@@ -233,7 +192,7 @@ int menuSelection() {
 
     switch (input) {
     case LIST_INVENTORY:
-      listInventory(PATH, false);
+      listInventory(false);
       break;
     case ADD_PRODUCT:
       addProduct(PATH);
