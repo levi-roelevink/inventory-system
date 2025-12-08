@@ -6,6 +6,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -118,50 +119,6 @@ int getProductPosition(int productIndex) {
   return pos;
 }
 
-void removeProduct(string path) {
-  int products = listInventory(path, true);
-
-  cout << "\nSelect a product to remove (0 to cancel): ";
-  int input = selectIntBetweenBounds(0, 999);
-
-  // if (input == 0) {
-  //   return;
-  // }
-
-  cout << "Selected: " << input << endl;
-  // TODO: How to remove this product from the inventory?
-
-  // -1 because products are listed from 1 onwards while indices start at 0
-  int pos = getProductPosition(input - 1);
-  cout << "Position " << pos << endl;
-}
-
-// 1. Print menu options
-// 2. Prompt user for menu selection
-// 3. Call selected functionality
-int menuSelection() {
-  while (true) {
-    cout << PRINT_MENU;
-    int input = selectIntBetweenBounds(1, 4);
-
-    switch (input) {
-    case LIST_INVENTORY:
-      listInventory(PATH, false);
-      break;
-    case ADD_PRODUCT:
-      addProduct(PATH);
-      break;
-    case REMOVE_PRODUCT:
-      removeProduct(PATH);
-      break;
-    case EXIT:
-      return 0;
-    }
-
-    cout << "\n";
-  }
-}
-
 int loadMockData(string path) {
   // Open file for reading and writing
   ofstream of;
@@ -171,7 +128,7 @@ int loadMockData(string path) {
     return -1;
   }
 
-  of << "Banana 3\n";
+  of << "Banana\n";
   of << "Kiwi\n";
   of << "Apple\n";
   of << "Mango\n";
@@ -209,6 +166,87 @@ int readThenWrite() {
   cout << "\n" << endl;
 
   return 0;
+}
+
+vector<string> loadInventoryToVector() {
+  vector<string> products;
+
+  ifstream file(PATH);
+  if (!file.is_open()) {
+    throw runtime_error("Error opening inventory.");
+  }
+
+  string line;
+
+  while (getline(file, line)) {
+    if (line != "") {
+      products.push_back(line);
+    }
+  }
+
+  return products;
+}
+
+void writeVectorToFile(vector<string> v) {
+  ofstream file(PATH, ios::trunc);
+  if (!file.is_open()) {
+    throw runtime_error("Error opening inventory.");
+  }
+
+  for (string s : v) {
+    file << s + "\n";
+  }
+
+  file.close();
+}
+
+void removeProduct() {
+  vector<string> products = loadInventoryToVector();
+
+  int size = products.size();
+  if (size == 0) {
+    cout << "Inventory is already empty." << endl;
+    return;
+  }
+
+  for (int i = 0; i < size; i++) {
+    cout << "(" << i + 1 << ") " << products[i] << endl;
+  }
+
+  cout << "\nSelect a product to remove (0 to cancel): ";
+  int input = selectIntBetweenBounds(0, size);
+  if (input == 0) { // Cancel removal
+    return;
+  }
+
+  products.erase(products.begin() + (input - 1));
+  writeVectorToFile(products);
+}
+
+// 1. Print menu options
+// 2. Prompt user for menu selection
+// 3. Call selected functionality
+int menuSelection() {
+  while (true) {
+    cout << PRINT_MENU;
+    int input = selectIntBetweenBounds(1, 4);
+
+    switch (input) {
+    case LIST_INVENTORY:
+      listInventory(PATH, false);
+      break;
+    case ADD_PRODUCT:
+      addProduct(PATH);
+      break;
+    case REMOVE_PRODUCT:
+      removeProduct();
+      break;
+    case EXIT:
+      return 0;
+    }
+
+    cout << "\n";
+  }
 }
 
 int main() {
