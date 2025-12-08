@@ -1,7 +1,3 @@
-#include <cstddef>
-#include <cstdlib>
-#include <cstring>
-#include <exception>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
@@ -15,10 +11,11 @@ const string PATH = "inventory.txt";
 const int LIST_INVENTORY = 1;
 const int ADD_PRODUCT = 2;
 const int REMOVE_PRODUCT = 3;
-const int EXIT = 4;
-const string PRINT_MENU = "**********\n(1) List inventory\n(2) Add "
-                          "product\n(3) Remove product\n(4) Exit "
-                          "program\n**********\nSelect an option: ";
+const int LOAD_MOCK_DATA = 4;
+const int EXIT = 5;
+const string PRINT_MENU = "**********\n(1) List Inventory\n(2) Add "
+                          "Product\n(3) Remove Product\n(4) Load Mock Data\n(5) Exit "
+                          "Program\n**********\nSelect an Option: ";
 
 int selectIntBetweenBounds(int lowerBound, int upperBound) {
   int result;
@@ -47,56 +44,39 @@ string promptUserForProduct() {
   return input;
 }
 
-void addProduct(string path) {
-  ofstream of;
+void addProduct() {
+  ofstream file;
 
-  // Opening file using ofstream
-  of.open(path, ios::app);
-  if (!of) {
-    cout << "Unable to find inventory. Please try again." << endl;
+  // Opening file in append mode
+  file.open(PATH, ios::app);
+  if (!file) {
+    cout << "Error opening inventory." << endl;
     return;
   }
 
   string val = promptUserForProduct();
 
-  of << val << ",";
-  of.close();
+  file << val << "\n";
+  file.close();
 
   cout << "Added " << val << " to inventory." << endl;
 }
 
-int getProductPosition(int productIndex) {
-  ifstream file(PATH);
-  if (!file.is_open()) {
-    throw runtime_error("Error opening file.");
-  }
-
-  int pos = 0;
-  string line;
-
-  for (int i = 0; i < productIndex; i++) {
-    getline(file, line);
-    pos += line.length() + 2; // 2 extra for newline \n
-  }
-
-  return pos;
-}
-
-void loadMockData(string path) {
+void loadMockData() {
   // Open file for reading and writing
-  ofstream of;
-  of.open(path);
-  if (!of) {
+  ofstream file;
+  file.open(PATH);
+  if (!file) {
     cout << "Unable to find inventory. Please try again." << endl;
     return;
   }
 
-  of << "Banana\n";
-  of << "Kiwi\n";
-  of << "Apple\n";
-  of << "Mango\n";
+  file << "Banana\n";
+  file << "Kiwi\n";
+  file << "Apple\n";
+  file << "Mango\n";
 
-  of.close();
+  file.close();
   cout << "Loaded mock data.\n" << endl;
 }
 
@@ -188,17 +168,20 @@ int listInventory(bool numbered) {
 int menuSelection() {
   while (true) {
     cout << PRINT_MENU;
-    int input = selectIntBetweenBounds(1, 4);
+    int input = selectIntBetweenBounds(1, 5);
 
     switch (input) {
     case LIST_INVENTORY:
       listInventory(false);
       break;
     case ADD_PRODUCT:
-      addProduct(PATH);
+      addProduct();
       break;
     case REMOVE_PRODUCT:
       removeProduct();
+      break;
+    case LOAD_MOCK_DATA:
+      loadMockData();
       break;
     case EXIT:
       return 0;
@@ -209,8 +192,6 @@ int menuSelection() {
 }
 
 int main() {
-  loadMockData(PATH);
-
   int menuSelector = menuSelection();
 
   cout << "Goodbye!" << endl;
