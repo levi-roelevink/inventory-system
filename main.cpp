@@ -1,8 +1,10 @@
 #include <cstddef>
 #include <cstdlib>
+#include <cstring>
 #include <exception>
 #include <fstream>
 #include <iostream>
+#include <stdexcept>
 #include <string>
 
 using namespace std;
@@ -51,14 +53,15 @@ void addProduct(string path) {
   of.open(path, ios::app);
   if (!of) {
     cout << "Unable to find inventory. Please try again." << endl;
-  } else {
-    string val = promptUserForProduct();
-
-    of << val << "\n";
-    of.close();
-
-    cout << "Added " << val << " to inventory." << endl;
+    return;
   }
+
+  string val = promptUserForProduct();
+
+  of << val << ",";
+  of.close();
+
+  cout << "Added " << val << " to inventory." << endl;
 }
 
 int listInventory(string path, bool numbered) {
@@ -77,11 +80,14 @@ int listInventory(string path, bool numbered) {
       break;
     }
 
+    long strLength = s.length();
+
     count++;
     if (numbered) {
-      cout << "(" << count << ") " << s << endl;
+      cout << "(" << count << ") " << s << " (strLength = " << strLength << ")"
+           << endl;
     } else {
-      cout << s << endl;
+      cout << s << " (strLength = " << strLength << ")" << endl;
     }
   }
 
@@ -95,7 +101,24 @@ int listInventory(string path, bool numbered) {
   return count;
 }
 
-void removeP(string path) {
+int getProductPosition(int productIndex) {
+  ifstream file(PATH);
+  if (!file.is_open()) {
+    throw runtime_error("Error opening file.");
+  }
+
+  int pos = 0;
+  string line;
+
+  for (int i = 0; i < productIndex; i++) {
+    getline(file, line);
+    pos += line.length() + 2; // 2 extra for newline \n
+  }
+
+  return pos;
+}
+
+void removeProduct(string path) {
   int products = listInventory(path, true);
 
   cout << "\nSelect a product to remove (0 to cancel): ";
@@ -108,28 +131,10 @@ void removeP(string path) {
   cout << "Selected: " << input << endl;
   // TODO: How to remove this product from the inventory?
 
-  // Open file
-  // Set file position pointer
-  // Write ""
-  // ofstream of;
-  // of.open(path);
-  // if (!of) {
-  //   cout << "Unable to find inventory. Please try again." << endl;
-  //   return;
-  // }
-
-  // First argument is the index of the character at which to start
-  // Banana is 6 characters long: at 0 = Banana, 1 = anana, 5 = a, and at 6
-  // starts Blueberries
-  // of.seekg(input, ios::app);
-  // string s;
-  // f >> s;
-  // cout << "Data at position " << input << ": \"" << s << "\"" << endl;
-
-  // of.close();
+  // -1 because products are listed from 1 onwards while indices start at 0
+  int pos = getProductPosition(input - 1);
+  cout << "Position " << pos << endl;
 }
-
-void removeProduct(string path) {}
 
 // 1. Print menu options
 // 2. Prompt user for menu selection
@@ -157,22 +162,53 @@ int menuSelection() {
   }
 }
 
-void loadMockData(string path) {
+int loadMockData(string path) {
   // Open file for reading and writing
   ofstream of;
   of.open(path);
   if (!of) {
     cout << "Unable to find inventory. Please try again." << endl;
-    return;
+    return -1;
   }
 
-  of << "Banana\n";
+  of << "Banana 3\n";
   of << "Kiwi\n";
   of << "Apple\n";
   of << "Mango\n";
 
   of.close();
   cout << "Loaded mock data.\n" << endl;
+
+  return 0;
+}
+
+int readThenWrite() {
+  ofstream file(PATH, ios::in | ios::out);
+
+  if (!file.is_open()) {
+    cerr << "ERROR!" << endl;
+    throw runtime_error("Failed to open file at: " + PATH);
+    return -1;
+  }
+
+  string text;
+  // file >> text;
+  // cout << "Read from file: " << text << endl;
+
+  long writePos = file.tellp();
+  cout << "Write position: " << writePos << endl;
+
+  file.seekp(0, ios::beg);
+  writePos = file.tellp();
+  cout << "Write position after seekp(0, ios::beg): " << writePos << endl;
+
+  // This should write
+  file << "Ananab";
+
+  file.close();
+  cout << "\n" << endl;
+
+  return 0;
 }
 
 int main() {
