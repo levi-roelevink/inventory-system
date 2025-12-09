@@ -1,8 +1,10 @@
+#include "InventorySystem.h"
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <string>
 #include <vector>
+
 
 using namespace std;
 
@@ -14,10 +16,10 @@ const int REMOVE_PRODUCT = 3;
 const int LOAD_MOCK_DATA = 4;
 const int EXIT = 5;
 const string PRINT_MENU = "**********\n(1) List Inventory\n(2) Add "
-                          "Product\n(3) Remove Product\n(4) Load Mock Data\n(5) Exit "
-                          "Program\n**********\nSelect an Option: ";
+    "Product\n(3) Remove Product\n(4) Load Mock Data\n(5) Exit "
+    "Program\n**********\nSelect an Option: ";
 
-int selectIntBetweenBounds(int lowerBound, int upperBound) {
+int InventorySystem::selectIntBetweenBounds(int lowerBound, int upperBound) {
   int result;
 
   cin >> result;
@@ -32,7 +34,7 @@ int selectIntBetweenBounds(int lowerBound, int upperBound) {
   return result;
 }
 
-string promptUserForProduct() {
+string InventorySystem::promptUserForProduct() {
   cout << "Product name: ";
 
   string input;
@@ -44,7 +46,7 @@ string promptUserForProduct() {
   return input;
 }
 
-void addProduct() {
+void InventorySystem::addProduct() {
   ofstream file;
 
   // Opening file in append mode
@@ -62,7 +64,7 @@ void addProduct() {
   cout << "Added " << val << " to inventory." << endl;
 }
 
-void loadMockData() {
+void InventorySystem::loadMockData() {
   // Open file for reading and writing
   ofstream file;
   file.open(PATH);
@@ -80,7 +82,7 @@ void loadMockData() {
   cout << "Loaded mock data.\n" << endl;
 }
 
-vector<string> loadInventoryToVector() {
+vector<string> InventorySystem::loadInventoryToVector() {
   vector<string> products;
 
   ifstream file(PATH);
@@ -99,7 +101,7 @@ vector<string> loadInventoryToVector() {
   return products;
 }
 
-void writeVectorToFile(vector<string> v) {
+void InventorySystem::writeVectorToFile(vector<string> v) {
   ofstream file(PATH, ios::trunc);
   if (!file.is_open()) {
     throw runtime_error("Error opening inventory.");
@@ -112,7 +114,7 @@ void writeVectorToFile(vector<string> v) {
   file.close();
 }
 
-void removeProduct() {
+void InventorySystem::removeProduct() {
   vector<string> products = loadInventoryToVector();
 
   int size = products.size();
@@ -136,7 +138,7 @@ void removeProduct() {
   writeVectorToFile(products);
 }
 
-int listInventory(bool numbered) {
+int InventorySystem::listInventory(bool numbered) {
   vector<string> products = loadInventoryToVector();
   int size = products.size();
 
@@ -165,7 +167,7 @@ int listInventory(bool numbered) {
 // 1. Print menu options
 // 2. Prompt user for menu selection
 // 3. Call selected functionality
-int menuSelection() {
+int InventorySystem::menuSelection() {
   while (true) {
     cout << PRINT_MENU;
     int input = selectIntBetweenBounds(1, 5);
@@ -192,7 +194,8 @@ int menuSelection() {
 }
 
 int main() {
-  int menuSelector = menuSelection();
+  InventorySystem sys;
+  sys.menuSelection();
 
   cout << "Goodbye!" << endl;
   return 0;
